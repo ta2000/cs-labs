@@ -24,7 +24,7 @@ public class Puzzle {
 	public boolean[][] locked;
 	int nextX;
 	int nextY;
-	
+
 	public Puzzle(double x, double y, int boxSize) {
 		this.x = x;
 		this.y = y;
@@ -35,7 +35,7 @@ public class Puzzle {
 		// Prevent program from changing preset values
 		this.locked = new boolean[9][9];
 	}
-	
+
 	public void solve(int x, int y) {
 		this.nextX++;
 		if (!this.locked[x][y]) {
@@ -66,7 +66,7 @@ public class Puzzle {
 			//System.out.println("Buga");
 		}
 	}
-	
+
 	public boolean columnContains(int row, int column) {
 		boolean contains = false;
 		for (int i=0; i<9; i++) {
@@ -77,7 +77,7 @@ public class Puzzle {
 		}
 		return contains;
 	}
-	
+
 	public boolean rowContains(int column, int row) {
 		boolean contains = false;
 		for (int i=0; i<9; i++) {
@@ -88,13 +88,13 @@ public class Puzzle {
 		}
 		return contains;
 	}
-	
+
 	public boolean squareContains(int column, int row) {
 		boolean contains = false;
 		int squareX = (column/3)*3;
 		int squareY = (row/3)*3;
 		int value = this.grid[column][row];
-		
+
 		for (int i=0; i<3; i++) {
 			for (int j=0; j<3; j++) {
 				if ( !((squareX+i)==column && (squareY+j)==row) ) {
@@ -103,24 +103,24 @@ public class Puzzle {
 				}
 			}
 		}
-		
+
 		return contains;
 	}
-	
+
 	public void changeCell(double x, double y, int amount) {
 		// Disable editing while the solver is running
 		if (solving)
 			return;
-		
+
 		// Find cell from x/y position on canvas
 		double roundX = Math.round((Math.floor((x - this.x)/this.boxSize)*this.boxSize)/this.boxSize);
 		double roundY = Math.round((Math.floor((y - this.y)/this.boxSize)*this.boxSize)/this.boxSize);
-		
+
 		// Prevent array out of bounds
 		if (roundX >= 9 || roundY >= 9 ||
 			roundX < 0  || roundY < 0)
 				return;
-		
+
 		// Change cell number by (amount), preventing negative numbers
 		if (this.grid[(int)roundX][(int)roundY] + amount >= 0) {
 			this.grid[(int)roundX][(int)roundY] += amount;
@@ -128,18 +128,21 @@ public class Puzzle {
 		} else {
 			this.grid[(int)roundX][(int)roundY] = 9;
 		}
-		
+
 		// Wrap around above 9
 		grid[(int)roundX][(int)roundY] %= 10;
-		
+
 		// Tell the program not to modify cells changed by the user
 		if (this.grid[(int)roundX][(int)roundY] != 0)
 			this.locked[(int)roundX][(int)roundY] = true;
 		else
 			this.locked[(int)roundX][(int)roundY] = false;
 	}
-	
+
 	public void reset() {
+        this.nextX = 0;
+        this.nextY = 0;
+
 		for (int i=0; i<9; i++) {
 			for (int j=0; j<9; j++) {
 				this.grid[i][j] = 0;
@@ -147,7 +150,7 @@ public class Puzzle {
 			}
 		}
 	}
-	
+
 	public void update() {
 		if (solving) {
 			if (this.nextX > 8) {
@@ -163,7 +166,7 @@ public class Puzzle {
 				solve(this.nextX, this.nextY);
 		}
 	}
-	
+
 	public void draw(GraphicsContext gc) {
 		gc.setStroke(Color.BLACK);
 		gc.setLineWidth(1);
@@ -179,7 +182,7 @@ public class Puzzle {
 						this.boxSize*3
 					);
 				}
-			
+
 				gc.setLineWidth(1);
 				gc.strokeRect(
 					this.x + i*this.boxSize,
@@ -187,13 +190,13 @@ public class Puzzle {
 					this.boxSize,
 					this.boxSize
 				);
-				
+
 				gc.setFont(Font.font("Verdana", 18));
 				if (this.locked[i][j])
 					gc.setFill(Color.RED);
 				else
 					gc.setFill(Color.BLACK);
-				
+
 				if (grid[i][j] > 0) {
 					gc.fillText(
 						Integer.toString(grid[i][j]),
@@ -203,7 +206,7 @@ public class Puzzle {
 				}
 			}
 		}
-		
+
 		gc.setFill(Color.web("0xFFFF00", 0.5));
 		gc.fillRect(
 			this.x + this.nextX * this.boxSize,
